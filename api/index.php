@@ -25,10 +25,13 @@ $di->set(
     function () {
         return new PdoMysql(
             [
-                'host'     => 'localhost',
+               // 'host'     => 'localhost',
+				'host' => 'mariadb132372-devipuram.j.layershift.co.uk'
                 'username' => 'root',
-                'password' => '',
-                'dbname'   => 'devipuram',
+                //'password' => '',
+				 'password' => 'NEGkst44234',
+               // 'dbname'   => 'devipuram',
+				'dbname'   => 'testdevipuram',
             ]
         );
     }
@@ -37,14 +40,20 @@ $di->set(
 // Create and bind the DI to the application
 $app = new Micro($di);
  
-$app->before(function() use ($app) {
-//$origin = $app->request->getHeader("ORIGIN") ? $app->request->getHeader("ORIGIN") : '*';
+   $app->before(function() use ($app) {
+  //$origin = $app->request->getHeader("ORIGIN") ? $app->request->getHeader("ORIGIN") : '*';
 
-$app->response->setHeader("Access-Control-Allow-Origin", '*')
+      $app->response->setHeader("Access-Control-Allow-Origin", '*')
+  //  $app->response->setHeader("Access-Control-Allow-Origin", 'http://localhost:3000')
       ->setHeader("Access-Control-Allow-Methods", 'GET,PUT,POST,DELETE,OPTIONS')
-      ->setHeader("Access-Control-Allow-Headers", 'Origin, X-Requested-With, Content-Range, Content-Disposition, Content-Type, Authorization')
-      ->setHeader("Access-Control-Allow-Credentials", true);
+	 // response.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers")
+      ->setHeader("Access-Control-Allow-Headers", 'Accept,Origin, X-Requested-With, Content-Range, Content-Disposition, Content-Type, Authorization,Access-Control-Allow-Origin')
+	 // ->setHeader("Access-Control-Allow-Headers", 'Origin, X-Requested-With, Content-Range, Content-Disposition, Content-Type, Authorization')
+	  //->setHeader("Access-Control-Allow-Headers", 'X-Requested-With, Content-Range, Content-Disposition, Content-Type, Authorization')
+      ->setHeader("Access-Control-Allow-Credentials", 'true');
 });
+
+
 
 $app->options('/{catch:(.*)}', function() use ($app) { 
     $app->response->setStatusCode(200, "OK")->send();
