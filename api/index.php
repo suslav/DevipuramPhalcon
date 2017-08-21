@@ -41,16 +41,18 @@ $di->set(
 $app = new Micro($di);
  
    $app->before(function() use ($app) {
-  //$origin = $app->request->getHeader("ORIGIN") ? $app->request->getHeader("ORIGIN") : '*';
 
-     //  $app->response->setHeader("Access-Control-Allow-Origin", '*')
-   $app->response->setHeader("Access-Control-Allow-Origin", 'http://localhost:3000')
+    $app->response->setHeader("Access-Control-Allow-Origin", 'http://localhost:3000')
+	// $app->response->setHeader("Access-Control-Allow-Origin", '*')
+	// ->setHeader("Access-Control-Allow-Methods", '*')
+	// ->setHeader("Access-Control-Allow-Headers", '*')
+	// ->setHeader("Access-Control-Allow-Credentials", 'true');
+
       ->setHeader("Access-Control-Allow-Methods", 'GET,PUT,POST,DELETE,OPTIONS')
-	 // response.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers")
-      ->setHeader("Access-Control-Allow-Headers", 'Accept,Origin, X-Requested-With, Content-Range, Content-Disposition, Content-Type, Authorization,Access-Control-Allow-Origin')
-	 // ->setHeader("Access-Control-Allow-Headers", 'Origin, X-Requested-With, Content-Range, Content-Disposition, Content-Type, Authorization')
-	  //->setHeader("Access-Control-Allow-Headers", 'X-Requested-With, Content-Range, Content-Disposition, Content-Type, Authorization')
-      ->setHeader("Access-Control-Allow-Credentials", 'true');
+	//->setHeader("Access-Control-Allow-Headers", 'Accept,Origin, X-Requested-With, Content-Range, Content-Disposition, Content-Type, Authorization,Access-Control-Allow-Origin','Access-Control-Allow-Credentials','Access-Control-Allow-Methods')
+	  ->setHeader("Access-Control-Allow-Headers", 'Accept,Content-Type')     
+	  ->setHeader("Access-Control-Allow-Credentials", 'true');
+
 });
 
 
@@ -104,7 +106,8 @@ $app->get('/api/users', function() use ($app) {
 $app->post('/api/userlogin', function() use ($app) {
 
          $robot = $app->request->getJsonRawBody();
-		 $phql = 'select count(*) as count from DevipuramPhalcon\models\users WHERE UserName=:UserName: AND Password=:Password:';		 
+		// $phql = 'select count(*) as count from DevipuramPhalcon\models\users WHERE UserName=:UserName: AND Password=:Password:';		 
+		 $phql = 'select count(*) as count,UserID from DevipuramPhalcon\models\users WHERE UserName=:UserName: AND Password=:Password:';	
 		 $status = $app->modelsManager->executeQuery(
             $phql,
             [
@@ -121,13 +124,20 @@ $app->post('/api/userlogin', function() use ($app) {
 		    $response->setStatusCode(200, 'loginsuccess');
         //  $robot->count = $status->getModel()->count;
 
-            $response->setJsonContent(
+        //    $response->setJsonContent(
+         //       [
+         //           'status' => 'OK',
+		//		     'login'   => 'success',
+         //       ]
+         //   );		
+			
+			 $response->setJsonContent(
                 [
                     'status' => 'OK',
-                     //'data'   => $robot,
 				     'login'   => 'success',
+					 'id'   => $status[0]->UserID
                 ]
-            );
+            );	
 
 
 }
@@ -160,6 +170,33 @@ $app->post('/api/usersignup',
     
         $robot = $app->request->getJsonRawBody();
 
+
+		 $pql = 'select count(*) as count from DevipuramPhalcon\models\users WHERE UserName=:UserName:';
+
+		  $code = $app->modelsManager->executeQuery(
+            $pql,
+            [
+                'UserName' => $robot->UserName               				
+            ]
+        );
+
+		  $response = new Response();
+
+		  if ($code[0]->count > 0) {
+
+		  $response->setStatusCode(500, 'Duplicate');
+
+		  $response->setJsonContent(
+                [
+                    'status'   => 'Duplicate',
+                    'message' => 'email already exists',
+                ]
+            );
+
+		  }
+		  else
+		  {
+		  
         $phql = 'INSERT INTO DevipuramPhalcon\models\users (UserTypeID, UserName, FirstName,Password) VALUES (2, :UserName:, :FirstName:,:Password:)';
 
         $status = $app->modelsManager->executeQuery(
@@ -171,24 +208,34 @@ $app->post('/api/usersignup',
             ]
         );
 
-        // Create a response
+		 // Create a response
 
 
-         $response = new Response();
+      //   $response = new Response();
 		  
         // Check if the insertion was successful
         if ($status->success() === true) {
             // Change the HTTP status
             $response->setStatusCode(201, 'Created');
 
-            $robot->id = $status->getModel()->id;
+          //  $robot->id = $status->getModel()->id;
 
-            $response->setJsonContent(
+           // $response->setJsonContent(
+           //     [
+           //         'status' => 'OK',
+           //         'data'   => $robot,
+           //     ]
+           // );
+
+		      $response->setJsonContent(
                 [
                     'status' => 'OK',
-                    'data'   => $robot,
+                    'message'   => 'created',
                 ]
-            );
+
+				);
+
+
         } else {
             // Change the HTTP status
             $response->setStatusCode(409, 'Conflict');
@@ -200,13 +247,27 @@ $app->post('/api/usersignup',
                 $errors[] = $message->getMessage();
             }
 
-            $response->setJsonContent(
+           // $response->setJsonContent(186
+
+           //     [
+           //         'status'   => 'ERROR',
+          //          'messages' => $errors,
+          //      ]
+          //  );
+
+		   $response->setJsonContent(
                 [
                     'status'   => 'ERROR',
-                    'messages' => $errors,
+                    'message' => 'ERROR',
                 ]
             );
         }
+
+		  }
+
+
+
+       
 
         return $response;
     }
