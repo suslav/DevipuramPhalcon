@@ -6,7 +6,6 @@ use Phalcon\Di\FactoryDefault;
 use Phalcon\Db\Adapter\Pdo\Mysql as PdoMysql;
 use Phalcon\Http\Response;
 
-// Use Loader() to autoload our model
 $loader = new Loader();
 
 $loader->registerNamespaces(
@@ -61,7 +60,7 @@ $app->options('/{catch:(.*)}', function() use ($app) {
     $app->response->setStatusCode(200, "OK")->send();
 });
 
-
+//events
 
 $app->get('/api/events', function() use ($app) {
  
@@ -81,6 +80,7 @@ $app->get('/api/events', function() use ($app) {
 
         echo json_encode($data); });
 
+//users
 
 $app->get('/api/users', function() use ($app) {
  
@@ -103,10 +103,9 @@ $app->get('/api/users', function() use ($app) {
         return json_encode($data); });
 
   
-$app->post('/api/userlogin', function() use ($app) {
+ $app->post('/api/userlogin', function() use ($app) {
 
          $robot = $app->request->getJsonRawBody();
-		// $phql = 'select count(*) as count from DevipuramPhalcon\models\users WHERE UserName=:UserName: AND Password=:Password:';		 
 		 $phql = 'select count(*) as count,UserID from DevipuramPhalcon\models\users WHERE UserName=:UserName: AND Password=:Password:';	
 		 $status = $app->modelsManager->executeQuery(
             $phql,
@@ -122,15 +121,7 @@ $app->post('/api/userlogin', function() use ($app) {
 		if ($status[0]->count > 0) {
 
 		    $response->setStatusCode(200, 'loginsuccess');
-        //  $robot->count = $status->getModel()->count;
-
-        //    $response->setJsonContent(
-         //       [
-         //           'status' => 'OK',
-		//		     'login'   => 'success',
-         //       ]
-         //   );		
-			
+        
 			 $response->setJsonContent(
                 [
                     'status' => 'OK',
@@ -273,6 +264,27 @@ $app->post('/api/usersignup',
     }
 );
 
+//photoalbum
+
+$app->get('/api/photoalbum', function() use ($app) {
+
+		$phql = 'SELECT * from DevipuramPhalcon\models\photoalbum';
+
+        $events = $app->modelsManager->executeQuery($phql);
+
+        $data = [];
+
+        foreach ($events as $event) {
+            $data[] = [
+                'AlbumId'   => $event->AlbumId,
+                'Title' => $event->Title,
+				'Description' => $event->Description,
+				'AlbumUrl' => $event->AlbumUrl,
+				'AlbumThumbUrl' => $event->AlbumThumbUrl
+            ];
+        }
+ return json_encode($data);  
+ });
 	  
 $app->get(
     '/api/events/search/{name}',
