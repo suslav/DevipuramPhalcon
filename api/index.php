@@ -110,8 +110,11 @@ $app->get('/api/users', function() use ($app) {
 		 $status = $app->modelsManager->executeQuery(
             $phql,
             [
-                'UserName' => $robot->UserName,
-                'Password' => sha1($robot->Password),             
+               'UserName' => $robot->UserName,
+               'Password' => sha1($robot->Password),    
+			  
+			  // 'UserName' => $robot,
+              //  'Password' => sha1(123456),     
             ]
         );
 
@@ -285,6 +288,261 @@ $app->get('/api/photoalbum', function() use ($app) {
         }
  return json_encode($data);  
  });
+
+ //generalvisitorsanswers
+
+ $app->post('/api/generalvisitorsanswersinsert',
+  function () use ($app) {
+    
+        $robot = $app->request->getJsonRawBody();
+		
+        $phql = 'INSERT INTO DevipuramPhalcon\models\generalvisitorsanswers (GVAnswer, GVQuestionID, VisitorFormID) VALUES (:GVAnswer:, :GVQuestionID:, :VisitorFormID:)';
+
+        $status = $app->modelsManager->executeQuery(
+            $phql,
+            [
+              //   'GVAnswer' => $robot->GVAnswer,
+              //    'GVQuestionID' => $robot->GVQuestionID,
+             //    'VisitorFormID' =>$robot->VisitorFormID	
+
+			//	if($robot.contains('|'))
+			//	{
+			//	$answer = $robot.Split('|');
+
+			//	for($i=0;$i<$answer.length,$i++){
+
+			//	$answer2 = $answer[i]
+			//	'GVAnswer' => $answer2->$answer2.Split('~')[0],
+			//	'GVQuestionID' => $answer2->$answer2.Split('~')[1],
+			//	'VisitorFormID' =>1
+
+			//	}
+			//	}
+
+			   'GVAnswer' => $robot,
+                 'GVQuestionID' => 1,
+                  'VisitorFormID' =>11	
+
+            ]
+        ); 
+
+         $response = new Response();
+		          
+        if ($status->success() === true) {
+            $response->setStatusCode(201, 'Created');
+			 
+		      $response->setJsonContent(
+                [
+                    'status' => 'OK',
+                    'message'   => 'created',
+                ]
+
+				);
+
+        } else {
+          
+            $response->setStatusCode(409, 'Conflict');
+ 
+            $errors = [];
+
+            foreach ($status->getMessages() as $message) {
+                $errors[] = $message->getMessage();
+            }           
+		   $response->setJsonContent(
+                [
+                    'status'   => 'ERROR',
+                    'message' => 'ERROR',
+                ]
+            );
+        }		 
+        return $response;
+    }
+);
+
+//generalvisitorsinteranswers
+
+ $app->post('/api/generalvisitorsinteranswersinsert',
+  function () use ($app) {
+    
+        $robot = $app->request->getJsonRawBody();
+		
+        $phql = 'INSERT INTO DevipuramPhalcon\models\generalvisitorsinteranswers (GVIAnswer, GVIQuestionID, VisitorFormID) VALUES (:GVIAnswer:, :GVIQuestionID:, :VisitorFormID:)';
+
+        $status = $app->modelsManager->executeQuery(
+            $phql,
+            [              
+			   'GVIAnswer' => $robot,
+                 'GVIQuestionID' => 1,
+                  'VisitorFormID' =>11	
+
+            ]
+        ); 
+
+         $response = new Response();
+		          
+        if ($status->success() === true) {
+            $response->setStatusCode(201, 'Created');
+			 
+		      $response->setJsonContent(
+                [
+                    'status' => 'OK',
+                    'message'   => 'created',
+                ]
+
+				);
+
+        } else {
+          
+            $response->setStatusCode(409, 'Conflict');
+ 
+            $errors = [];
+
+            foreach ($status->getMessages() as $message) {
+                $errors[] = $message->getMessage();
+            }           
+		   $response->setJsonContent(
+                [
+                    'status'   => 'ERROR',
+                    'message' => 'ERROR',
+                ]
+            );
+        }		 
+        return $response;
+    }
+);
+
+//svcanswer
+
+ $app->post('/api/svcanswerinsert',
+  function () use ($app) {
+    
+        $robot = $app->request->getJsonRawBody();
+		
+        $phql = 'INSERT INTO DevipuramPhalcon\models\svcanswer (SVCAnswer, SVCQuestionID, VisitorFormID) VALUES (:SVCAnswer:, :SVCQuestionID:, :VisitorFormID:)';
+
+        $status = $app->modelsManager->executeQuery(
+            $phql,
+            [              
+			   'SVCAnswer' => $robot,
+                 'SVCQuestionID' => 1,
+                  'VisitorFormID' =>11	
+
+            ]
+        ); 
+
+         $response = new Response();
+		          
+        if ($status->success() === true) {
+            $response->setStatusCode(201, 'Created');
+			 
+		      $response->setJsonContent(
+                [
+                    'status' => 'OK',
+                    'message'   => 'created',
+                ]
+
+				);
+
+        } else {
+          
+            $response->setStatusCode(409, 'Conflict');
+ 
+            $errors = [];
+
+            foreach ($status->getMessages() as $message) {
+                $errors[] = $message->getMessage();
+            }           
+		   $response->setJsonContent(
+                [
+                    'status'   => 'ERROR',
+                    'message' => 'ERROR',
+                ]
+            );
+        }		 
+        return $response;
+    }
+);
+
+//srimahameruanswers
+
+ $app->post('/api/srimahameruanswersinsert',
+  function () use ($app) {
+    
+        $robot = $app->request->getJsonRawBody();
+		
+        $phql = 'INSERT INTO DevipuramPhalcon\models\srimahameruanswers (SMMAnswer, SMMQuestionID, VisitorFormID) VALUES (:SMMAnswer:, :SMMQuestionID:, :VisitorFormID:)';
+
+        $status = $app->modelsManager->executeQuery(
+            $phql,
+            [              
+			   'SMMAnswer' => $robot,
+                 'SMMQuestionID' => 1,
+                  'VisitorFormID' =>11	
+
+            ]
+        ); 
+
+         $response = new Response();
+		          
+        if ($status->success() === true) {
+            $response->setStatusCode(201, 'Created');
+			 
+		      $response->setJsonContent(
+                [
+                    'status' => 'OK',
+                    'message'   => 'created',
+                ]
+
+				);
+
+        } else {
+          
+            $response->setStatusCode(409, 'Conflict');
+ 
+            $errors = [];
+
+            foreach ($status->getMessages() as $message) {
+                $errors[] = $message->getMessage();
+            }           
+		   $response->setJsonContent(
+                [
+                    'status'   => 'ERROR',
+                    'message' => 'ERROR',
+                ]
+            );
+        }		 
+        return $response;
+    }
+);
+
+
+//visitors
+
+$app->get('/api/visitors/{date}', function($date) use ($app) {
+
+		$phql = 'SELECT v.* from DevipuramPhalcon\models\visitors v WHERE v.Date = :date:';
+
+		//$phql = 'SELECT v.*,(select UserName from DevipuramPhalcon\models\users u where u.UserID =v.UserID) as UserName,(select FormType from DevipuramPhalcon\models\visitorformtypes f where f.FormTypeID =v.FormTypeID) as FormType FROM DevipuramPhalcon\models\visitors v WHERE v.Date = :date:';
+
+        $events = $app->modelsManager->executeQuery($phql,
+		[
+		'date' => $date,
+		]
+		);
+
+        $data = [];
+
+        foreach ($events as $event) {
+            $data[] = [
+                'VisitorFormID'   => $event->VisitorFormID,
+                'UserID' => $event->UserID,
+				'FormTypeID' => $event->FormTypeID,
+				'Date' => $event->Date
+            ];
+        }
+ return json_encode($data);  
+ });
+
 	  
 $app->get(
     '/api/events/search/{name}',
