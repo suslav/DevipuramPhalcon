@@ -295,10 +295,31 @@ $app->get('/api/photoalbum', function() use ($app) {
   function () use ($app) {
     
         $robot = $app->request->getJsonRawBody();
-		
-        $phql = 'INSERT INTO DevipuramPhalcon\models\generalvisitorsanswers (GVAnswer, GVQuestionID, VisitorFormID) VALUES (:GVAnswer:, :GVQuestionID:, :VisitorFormID:)';
 
-        $status = $app->modelsManager->executeQuery(
+		$now = new \DateTime();
+        $datetime_field = $now->format('Y-m-d');
+
+		$pql = 'INSERT INTO DevipuramPhalcon\models\visitors (UserID, FormTypeID, Date) VALUES (:UserID:, :FormTypeID:, :Date:)';
+
+		$status1 = $app->modelsManager->executeQuery(		
+            $pql,
+            [            
+			     'UserID' => $robot->UserID,
+                 'FormTypeID' => 1,
+                 'Date' =>$datetime_field	
+            ]
+        ); 
+
+		 $response = new Response();
+
+		   if ($status1->success() === true) {
+           // $response->setStatusCode(201, 'Created');
+			  $robot2->id = $status1->getModel()->VisitorFormID;
+
+
+		        $phql = 'INSERT INTO DevipuramPhalcon\models\generalvisitorsanswers (GVAnswer, GVQuestionID, VisitorFormID) VALUES (:GVAnswer:, :GVQuestionID:, :VisitorFormID:)';
+
+        $status = $app->modelsManager->executeQuery(		
             $phql,
             [
               //   'GVAnswer' => $robot->GVAnswer,
@@ -319,22 +340,23 @@ $app->get('/api/photoalbum', function() use ($app) {
 			//	}
 			//	}
 
-			   'GVAnswer' => $robot,
+			  // 'GVAnswer' => $robot,
+			   'GVAnswer' => $robot->GVAnswer,
                  'GVQuestionID' => 1,
-                  'VisitorFormID' =>11	
+                  'VisitorFormID' =>$robot2->id	
 
             ]
         ); 
 
-         $response = new Response();
+        
 		          
         if ($status->success() === true) {
             $response->setStatusCode(201, 'Created');
-			 
+			  $robot2->id = $status->getModel()->GVAnswerID;
 		      $response->setJsonContent(
                 [
                     'status' => 'OK',
-                    'message'   => 'created',
+                    'message'   => 'created',					
                 ]
 
 				);
@@ -354,7 +376,26 @@ $app->get('/api/photoalbum', function() use ($app) {
                     'message' => 'ERROR',
                 ]
             );
+        }
+		 
+
+        } else {
+          
+            $response->setStatusCode(409, 'Conflict');
+ 
+            $errors = [];
+
+            foreach ($status1->getMessages() as $message) {
+                $errors[] = $message->getMessage();
+            }           
+		   $response->setJsonContent(
+                [
+                    'status'   => 'ERROR',
+                    'message' => 'ERROR',
+                ]
+            );
         }		 
+		 
         return $response;
     }
 );
@@ -520,7 +561,9 @@ $app->get('/api/photoalbum', function() use ($app) {
 
 $app->get('/api/visitors/{date}', function($date) use ($app) {
 
-		$phql = 'SELECT v.* from DevipuramPhalcon\models\visitors v WHERE v.Date = :date:';
+		//$phql = 'SELECT v.* from DevipuramPhalcon\models\visitors v WHERE v.Date = :date:';
+
+		$phql = 'SELECT v.VisitorFormID,v.UserID,v.FormTypeID,v.Date, u.UserName,vf.FormType FROM DevipuramPhalcon\models\visitors v JOIN DevipuramPhalcon\models\users u ON v.UserID=u.UserID JOIN DevipuramPhalcon\models\visitorformtypes vf ON v.FormTypeID=vf.FormTypeID WHERE v.Date = :date:';
 
 		//$phql = 'SELECT v.*,(select UserName from DevipuramPhalcon\models\users u where u.UserID =v.UserID) as UserName,(select FormType from DevipuramPhalcon\models\visitorformtypes f where f.FormTypeID =v.FormTypeID) as FormType FROM DevipuramPhalcon\models\visitors v WHERE v.Date = :date:';
 
@@ -537,7 +580,9 @@ $app->get('/api/visitors/{date}', function($date) use ($app) {
                 'VisitorFormID'   => $event->VisitorFormID,
                 'UserID' => $event->UserID,
 				'FormTypeID' => $event->FormTypeID,
-				'Date' => $event->Date
+				'Date' => $event->Date,
+				'UserName' => $event->UserName,
+				'FormType' => $event->FormType
             ];
         }
  return json_encode($data);  
