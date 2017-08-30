@@ -588,6 +588,44 @@ $app->get('/api/visitors/{date}', function($date) use ($app) {
  return json_encode($data);  
  });
 
+ //formanswers
+ $app->get('/api/formanswers/{VisitorFormID}/{FormTypeID}', function($visitorformid,$formtypeid) use ($app) {
+
+        if($formtypeid == 1)
+		{
+		$phql = 'SELECT GVAnswerID as ID,GVAnswer as Answer,VisitorFormID from DevipuramPhalcon\models\generalvisitorsanswers WHERE VisitorFormID = :VisitorFormID:';
+		}
+		else if($formtypeid == 2)
+		{
+		$phql = 'SELECT GVIAnswerID as ID,GVIAnswer as Answer,VisitorFormID from DevipuramPhalcon\models\generalvisitorsinteranswers WHERE VisitorFormID = :VisitorFormID:';
+		}
+		else if($formtypeid == 3)
+		{
+		$phql = 'SELECT SVCAnswerID as ID,SVCAnswer as Answer,VisitorFormID from DevipuramPhalcon\models\svcanswer WHERE VisitorFormID = :VisitorFormID:';
+		}
+		else if($formtypeid == 4)
+		{
+		$phql = 'SELECT SMMAnswerID as ID,SMMAnswer as Answer,VisitorFormID from DevipuramPhalcon\models\srimahameruanswers WHERE VisitorFormID = :VisitorFormID:';
+		}		
+	 //$phql = 'SELECT v.VisitorFormID,v.UserID,v.FormTypeID,v.Date, u.UserName,vf.FormType FROM DevipuramPhalcon\models\visitors v JOIN DevipuramPhalcon\models\users u ON v.UserID=u.UserID JOIN DevipuramPhalcon\models\visitorformtypes vf ON v.FormTypeID=vf.FormTypeID WHERE v.Date = :date:';
+
+        $events = $app->modelsManager->executeQuery($phql,
+		[
+		'VisitorFormID' => $visitorformid,
+		]
+		);
+
+        $data = [];
+
+        foreach ($events as $event) {
+            $data[] = [
+                'ID'   => $event->ID,
+                'Answer' => $event->Answer,
+				'VisitorFormID' => $event->VisitorFormID				
+            ];
+        }
+ return json_encode($data);  
+ });
 	  
 $app->get(
     '/api/events/search/{name}',
