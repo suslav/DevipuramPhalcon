@@ -314,10 +314,8 @@ $app->get('/api/photoalbum', function() use ($app) {
 
 		   if ($status1->success() === true) {
            // $response->setStatusCode(201, 'Created');
-			  $robot2->id = $status1->getModel()->VisitorFormID;
-
-
-		        $phql = 'INSERT INTO DevipuramPhalcon\models\generalvisitorsanswers (GVAnswer, GVQuestionID, VisitorFormID) VALUES (:GVAnswer:, :GVQuestionID:, :VisitorFormID:)';
+			//  $robot2->visitfor = $status1->getModel()->VisitorFormID;
+		     $phql = 'INSERT INTO DevipuramPhalcon\models\generalvisitorsanswers (GVAnswer, GVQuestionID, VisitorFormID) VALUES (:GVAnswer:, :GVQuestionID:, :VisitorFormID:)';
 
         $status = $app->modelsManager->executeQuery(		
             $phql,
@@ -343,7 +341,7 @@ $app->get('/api/photoalbum', function() use ($app) {
 			  // 'GVAnswer' => $robot,
 			   'GVAnswer' => $robot->GVAnswer,
                  'GVQuestionID' => 1,
-                  'VisitorFormID' =>$robot2->id	
+                  'VisitorFormID' =>$status1->getModel()->VisitorFormID
 
             ]
         ); 
@@ -352,7 +350,7 @@ $app->get('/api/photoalbum', function() use ($app) {
 		          
         if ($status->success() === true) {
             $response->setStatusCode(201, 'Created');
-			  $robot2->id = $status->getModel()->GVAnswerID;
+			 // $robot2->id = $status->getModel()->GVAnswerID;
 		      $response->setJsonContent(
                 [
                     'status' => 'OK',
@@ -406,21 +404,37 @@ $app->get('/api/photoalbum', function() use ($app) {
   function () use ($app) {
     
         $robot = $app->request->getJsonRawBody();
+
+		$now = new \DateTime();
+        $datetime_field = $now->format('Y-m-d');
+
+		$pql = 'INSERT INTO DevipuramPhalcon\models\visitors (UserID, FormTypeID, Date) VALUES (:UserID:, :FormTypeID:, :Date:)';
+
+		$status1 = $app->modelsManager->executeQuery(		
+            $pql,
+            [            
+			     'UserID' => $robot->UserID,
+                 'FormTypeID' => 2,
+                 'Date' =>$datetime_field	
+            ]
+        ); 
+
+		 $response = new Response();
+
+		 if ($status1->success() === true) {
 		
         $phql = 'INSERT INTO DevipuramPhalcon\models\generalvisitorsinteranswers (GVIAnswer, GVIQuestionID, VisitorFormID) VALUES (:GVIAnswer:, :GVIQuestionID:, :VisitorFormID:)';
 
         $status = $app->modelsManager->executeQuery(
             $phql,
             [              
-			   'GVIAnswer' => $robot,
+			   'GVIAnswer' => $robot->GVIAnswer,
                  'GVIQuestionID' => 1,
-                  'VisitorFormID' =>11	
+                  'VisitorFormID' =>$status1->getModel()->VisitorFormID
 
             ]
         ); 
-
-         $response = new Response();
-		          
+		    
         if ($status->success() === true) {
             $response->setStatusCode(201, 'Created');
 			 
@@ -439,6 +453,22 @@ $app->get('/api/photoalbum', function() use ($app) {
             $errors = [];
 
             foreach ($status->getMessages() as $message) {
+                $errors[] = $message->getMessage();
+            }           
+		   $response->setJsonContent(
+                [
+                    'status'   => 'ERROR',
+                    'message' => 'ERROR',
+                ]
+            );
+        }		 		
+		 } else {
+          
+            $response->setStatusCode(409, 'Conflict');
+ 
+            $errors = [];
+
+            foreach ($status1->getMessages() as $message) {
                 $errors[] = $message->getMessage();
             }           
 		   $response->setJsonContent(
@@ -458,20 +488,37 @@ $app->get('/api/photoalbum', function() use ($app) {
   function () use ($app) {
     
         $robot = $app->request->getJsonRawBody();
+
+		$now = new \DateTime();
+        $datetime_field = $now->format('Y-m-d');
+
+		$pql = 'INSERT INTO DevipuramPhalcon\models\visitors (UserID, FormTypeID, Date) VALUES (:UserID:, :FormTypeID:, :Date:)';
+
+		$status1 = $app->modelsManager->executeQuery(		
+            $pql,
+            [            
+			     'UserID' => $robot->UserID,
+                 'FormTypeID' => 3,
+                 'Date' =>$datetime_field	
+            ]
+        ); 
+
+		 $response = new Response();
+		  if ($status1->success() === true) {
 		
         $phql = 'INSERT INTO DevipuramPhalcon\models\svcanswer (SVCAnswer, SVCQuestionID, VisitorFormID) VALUES (:SVCAnswer:, :SVCQuestionID:, :VisitorFormID:)';
 
         $status = $app->modelsManager->executeQuery(
             $phql,
             [              
-			   'SVCAnswer' => $robot,
+			   'SVCAnswer' => $robot->SVCAnswer,
                  'SVCQuestionID' => 1,
-                  'VisitorFormID' =>11	
+                  'VisitorFormID' =>$status1->getModel()->VisitorFormID
 
             ]
         ); 
 
-         $response = new Response();
+         //$response = new Response();
 		          
         if ($status->success() === true) {
             $response->setStatusCode(201, 'Created');
@@ -491,6 +538,22 @@ $app->get('/api/photoalbum', function() use ($app) {
             $errors = [];
 
             foreach ($status->getMessages() as $message) {
+                $errors[] = $message->getMessage();
+            }           
+		   $response->setJsonContent(
+                [
+                    'status'   => 'ERROR',
+                    'message' => 'ERROR',
+                ]
+            );
+        }	
+		 } else {
+          
+            $response->setStatusCode(409, 'Conflict');
+ 
+            $errors = [];
+
+            foreach ($status1->getMessages() as $message) {
                 $errors[] = $message->getMessage();
             }           
 		   $response->setJsonContent(
@@ -510,15 +573,33 @@ $app->get('/api/photoalbum', function() use ($app) {
   function () use ($app) {
     
         $robot = $app->request->getJsonRawBody();
+
+		$now = new \DateTime();
+        $datetime_field = $now->format('Y-m-d');
+
+		$pql = 'INSERT INTO DevipuramPhalcon\models\visitors (UserID, FormTypeID, Date) VALUES (:UserID:, :FormTypeID:, :Date:)';
+
+		$status1 = $app->modelsManager->executeQuery(		
+            $pql,
+            [            
+			     'UserID' => $robot->UserID,
+                 'FormTypeID' => 4,
+                 'Date' =>$datetime_field	
+            ]
+        ); 
+
+		 $response = new Response();
+
+		   if ($status1->success() === true) {
 		
         $phql = 'INSERT INTO DevipuramPhalcon\models\srimahameruanswers (SMMAnswer, SMMQuestionID, VisitorFormID) VALUES (:SMMAnswer:, :SMMQuestionID:, :VisitorFormID:)';
 
         $status = $app->modelsManager->executeQuery(
             $phql,
             [              
-			   'SMMAnswer' => $robot,
+			   'SMMAnswer' => $robot->SMMAnswer,
                  'SMMQuestionID' => 1,
-                  'VisitorFormID' =>11	
+                  'VisitorFormID' =>$status1->getModel()->VisitorFormID
 
             ]
         ); 
@@ -552,6 +633,23 @@ $app->get('/api/photoalbum', function() use ($app) {
                 ]
             );
         }		 
+
+		  } else {
+          
+            $response->setStatusCode(409, 'Conflict');
+ 
+            $errors = [];
+
+            foreach ($status1->getMessages() as $message) {
+                $errors[] = $message->getMessage();
+            }           
+		   $response->setJsonContent(
+                [
+                    'status'   => 'ERROR',
+                    'message' => 'ERROR',
+                ]
+            );
+        }		
         return $response;
     }
 );
