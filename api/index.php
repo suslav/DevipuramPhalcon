@@ -106,7 +106,7 @@ $app->get('/api/users', function() use ($app) {
  $app->post('/api/userlogin', function() use ($app) {
 
          $robot = $app->request->getJsonRawBody();
-		 $phql = 'select count(*) as count,UserID from DevipuramPhalcon\models\users WHERE UserName=:UserName: AND Password=:Password:';	
+		 $phql = 'select count(*) as count,UserID,UserTypeID from DevipuramPhalcon\models\users WHERE UserName=:UserName: AND Password=:Password:';	
 		 $status = $app->modelsManager->executeQuery(
             $phql,
             [
@@ -129,7 +129,8 @@ $app->get('/api/users', function() use ($app) {
                 [
                     'status' => 'OK',
 				     'login'   => 'success',
-					 'id'   => $status[0]->UserID
+					 'id'   => $status[0]->UserID,
+					 'UserTypeID'   => $status[0]->UserTypeID
                 ]
             );	
 
@@ -661,7 +662,7 @@ $app->get('/api/visitors/{date}', function($date) use ($app) {
 
 		//$phql = 'SELECT v.* from DevipuramPhalcon\models\visitors v WHERE v.Date = :date:';
 
-		$phql = 'SELECT v.VisitorFormID,v.UserID,v.FormTypeID,v.Date, u.UserName,vf.FormType FROM DevipuramPhalcon\models\visitors v JOIN DevipuramPhalcon\models\users u ON v.UserID=u.UserID JOIN DevipuramPhalcon\models\visitorformtypes vf ON v.FormTypeID=vf.FormTypeID WHERE v.Date = :date:';
+		$phql = 'SELECT v.VisitorFormID,v.UserID,v.FormTypeID,v.Date, u.UserName,vf.FormType FROM DevipuramPhalcon\models\visitors v JOIN DevipuramPhalcon\models\users u ON v.UserID=u.UserID JOIN DevipuramPhalcon\models\visitorformtypes vf ON v.FormTypeID=vf.FormTypeID WHERE v.Date = :date: ORDER by v.VisitorFormID desc';
 
 		//$phql = 'SELECT v.*,(select UserName from DevipuramPhalcon\models\users u where u.UserID =v.UserID) as UserName,(select FormType from DevipuramPhalcon\models\visitorformtypes f where f.FormTypeID =v.FormTypeID) as FormType FROM DevipuramPhalcon\models\visitors v WHERE v.Date = :date:';
 
